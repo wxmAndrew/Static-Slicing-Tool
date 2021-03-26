@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.uni_passau.fim.se2.slicer.util.cfg.CFGLocalVariableTableVisitorTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2020-05-27T18:27:24" hostname="ENVY-x360" time="0.113">
-  <properties/>
-  <testcase name="test_visitLocalVariableWithCV()" classname="de.uni_passau.fim.se2.slicer.util.cfg.CFGLocalVariableTableVisitorTest" time="0.112"/>
-  <testcase name="test_visitLocalVariable()" classname="de.uni_passau.fim.se2.slicer.util.cfg.CFGLocalVariableTableVisitorTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

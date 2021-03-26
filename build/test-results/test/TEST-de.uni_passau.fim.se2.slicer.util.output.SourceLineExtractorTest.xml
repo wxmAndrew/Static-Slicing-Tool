@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.uni_passau.fim.se2.slicer.util.output.SourceLineExtractorTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2020-05-27T18:27:25" hostname="ENVY-x360" time="0.099">
-  <properties/>
-  <testcase name="test_extractToFile()" classname="de.uni_passau.fim.se2.slicer.util.output.SourceLineExtractorTest" time="0.093"/>
-  <testcase name="test_extract()" classname="de.uni_passau.fim.se2.slicer.util.output.SourceLineExtractorTest" time="0.005"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
