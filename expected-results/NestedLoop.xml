@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+  <line nr="20" id="8" instruction="ISTORE 2"/>
+  <line nr="21" id="12" instruction="ISTORE 3"/>
+  <line nr="22" id="18" instruction="IF_ICMPGE L0"/>
+  <line nr="28" id="47" instruction="IINC 3 1"/>
+</report>

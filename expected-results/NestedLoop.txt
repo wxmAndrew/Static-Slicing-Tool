@@ -1,0 +1,20 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.NestedLoop -m "nestedWhileForLoops:()I" -l 28 -v i
+
+Result:
+(line:   20, id:    8)  ISTORE 2
+(line:   21, id:   12)  ISTORE 3
+(line:   22, id:   18)  IF_ICMPGE L0
+(line:   28, id:   47)  IINC 3 1
+
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.NestedLoop -m "nestedWhileForLoops:()I" -l 28 -v i -s src/main/java/de/uni_passau/fim/se2/examples/NestedLoop.java
+
+Result:
+int rows = 5;
+int i = 0;
+while (i < rows) {
+++i;
+

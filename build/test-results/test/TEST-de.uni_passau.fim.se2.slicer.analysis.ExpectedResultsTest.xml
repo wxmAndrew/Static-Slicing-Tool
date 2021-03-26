@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2020-05-27T18:27:25" hostname="ENVY-x360" time="11.459">
+  <properties/>
+  <testcase name="test_expected_results(String)[1]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="1.74"/>
+  <testcase name="test_expected_results(String)[2]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="3.661"/>
+  <testcase name="test_expected_results(String)[3]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="0.343"/>
+  <testcase name="test_expected_results(String)[4]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="3.157"/>
+  <testcase name="test_expected_results(String)[5]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="0.773"/>
+  <testcase name="test_expected_results(String)[6]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="0.45"/>
+  <testcase name="test_expected_results(String)[7]" classname="de.uni_passau.fim.se2.slicer.analysis.ExpectedResultsTest" time="1.315"/>
+  <system-out><![CDATA[
+Testing expected-results/Calculator.txt:1
+-c de.uni_passau.fim.se2.examples.Calculator -m "evaluate:(Ljava/lang/String;)I" -l 8 -v sum
+
+Testing expected-results/Calculator.txt:2
+-c de.uni_passau.fim.se2.examples.Calculator -m "evaluate:(Ljava/lang/String;)I" -l 8 -v sum -s src/main/java/de/uni_passau/fim/se2/examples/Calculator.java
+
+Testing expected-results/Complex.txt:1
+-c de.uni_passau.fim.se2.examples.Complex -m "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;" -l 79 -v imag
+
+Testing expected-results/Complex.txt:2
+-c de.uni_passau.fim.se2.examples.Complex -m "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;" -l 79 -v imag -s src/main/java/de/uni_passau/fim/se2/examples/Complex.java
+
+Testing expected-results/GCD.txt:1
+-c de.uni_passau.fim.se2.examples.GCD -m "gcd:(II)I" -l 9 -v x
+
+Testing expected-results/GCD.txt:2
+-c de.uni_passau.fim.se2.examples.GCD -m "gcd:(II)I" -l 9 -v x -s src/main/java/de/uni_passau/fim/se2/examples/GCD.java
+
+Testing expected-results/NestedLoop.txt:1
+-c de.uni_passau.fim.se2.examples.NestedLoop -m "nestedWhileForLoops:()I" -l 28 -v i
+
+Testing expected-results/NestedLoop.txt:2
+-c de.uni_passau.fim.se2.examples.NestedLoop -m "nestedWhileForLoops:()I" -l 28 -v i -s src/main/java/de/uni_passau/fim/se2/examples/NestedLoop.java
+
+Testing expected-results/Rational.txt:1
+-c de.uni_passau.fim.se2.examples.Rational -m "ofString:(Ljava/lang/String;)Lde/uni_passau/fim/se2/examples/Rational;" -l 117 -v den -s src/main/java/de/uni_passau/fim/se2/examples/Rational.java
+
+Testing expected-results/SimpleInteger.txt:1
+-c de.uni_passau.fim.se2.examples.SimpleInteger -m "foo:()I" -l 10 -v d
+
+Testing expected-results/SimpleInteger.txt:2
+-c de.uni_passau.fim.se2.examples.SimpleInteger -m "foo:()I" -l 10 -v d -s src/main/java/de/uni_passau/fim/se2/examples/SimpleInteger.java
+
+Testing expected-results/TestClass.txt:1
+-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 28 -v numFoos
+
+Testing expected-results/TestClass.txt:2
+-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 27 -v arbitraryInt
+
+Testing expected-results/TestClass.txt:3
+-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 27 -v arbitraryInt -s src/main/java/de/uni_passau/fim/se2/examples/TestClass.java
+
+Testing expected-results/TestClass.txt:4
+-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 28 -v numFoos -s src/main/java/de/uni_passau/fim/se2/examples/TestClass.java
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

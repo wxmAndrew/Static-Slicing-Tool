@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.uni_passau.fim.se2.slicer.util.cfg.CFGExtractorTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2020-05-27T18:27:23" hostname="ENVY-x360" time="1.584">
+  <properties/>
+  <testcase name="test_computeInternalMethodName1()" classname="de.uni_passau.fim.se2.slicer.util.cfg.CFGExtractorTest" time="1.575"/>
+  <testcase name="test_computeInternalMethodName2()" classname="de.uni_passau.fim.se2.slicer.util.cfg.CFGExtractorTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

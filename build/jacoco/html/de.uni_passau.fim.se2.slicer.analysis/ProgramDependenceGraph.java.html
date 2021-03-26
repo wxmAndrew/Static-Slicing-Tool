@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProgramDependenceGraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">slicer</a> &gt; <a href="index.source.html" class="el_package">de.uni_passau.fim.se2.slicer.analysis</a> &gt; <span class="el_source">ProgramDependenceGraph.java</span></div><h1>ProgramDependenceGraph.java</h1><pre class="source lang-java linenums">package de.uni_passau.fim.se2.slicer.analysis;
+
+import de.uni_passau.fim.se2.slicer.util.cfg.Node;
+import de.uni_passau.fim.se2.slicer.util.cfg.ProgramGraph;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
+
+import com.google.common.collect.Sets;
+
+import br.usp.each.saeg.asm.defuse.Variable;
+
+/** Provides an analysis that calculates the program-dependence graph. */
+public class ProgramDependenceGraph extends Analysis {
+	public ProgramDependenceGraph(final ClassNode pClassNode, final MethodNode pMethodNode) {
+<span class="fc" id="L21">		super(pClassNode, pMethodNode);</span>
+<span class="fc" id="L22">	}</span>
+	
+	/**
+	 * Return a graph representing the Program Dependence ProgramGraph of the
+	 * control flow graph, which is stored in the controlFlowProgramGraph class
+	 * attribute (this is inherited from the Analysis class).
+	 *
+	 * &lt;p&gt;
+	 * You may wish to use the class that computes the Control Dependence Tree to
+	 * obtain the control dependences, and may wish to use the code in the
+	 * {@link DataFlowAnalysis} class to obtain the data dependences.
+	 *
+	 * @return A graph representing the program-dependence graph of the control-flow
+	 *         graph
+	 */
+	public ProgramGraph computeResult() {
+		// TODO implement computation of program-dependence graph here
+
+<span class="fc" id="L40">		ControlDependenceGraph CDG = new ControlDependenceGraph(classNode, methodNode);</span>
+<span class="fc" id="L41">		ProgramGraph prgramDependencyGraph = CDG.computeResult();</span>
+<span class="fc" id="L42">		ProgramGraph dataDependenceGraph = computeDataDependenceGraph();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">		for (Node node : CDG.computeResult().getNodes()) {</span>
+<span class="fc" id="L44">			Set&lt;Node&gt; predecessors = dataDependenceGraph.getPredecessors(node);</span>
+<span class="fc" id="L45">			Set&lt;Node&gt; successors = dataDependenceGraph.getSuccessors(node);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">			for (Node pre : predecessors) {</span>
+<span class="fc" id="L47">				prgramDependencyGraph.addEdge(pre, node);</span>
+<span class="fc" id="L48">			}</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">			for (Node suc : successors) {</span>
+<span class="fc" id="L50">				prgramDependencyGraph.addEdge(node, suc);</span>
+<span class="fc" id="L51">			}</span>
+<span class="fc" id="L52">		}</span>
+<span class="fc" id="L53">		return prgramDependencyGraph;</span>
+	}
+
+	/**
+	 * Compute the set of nodes that belong to a backward slice, computed from a
+	 * given node in the program dependence graph.
+	 *
+	 * @param pNode The {@link Node} to start the backward slice
+	 * @return A set of nodes that represent the backward slice
+	 */
+
+	public Set&lt;Node&gt; backwardSlice(final Node pNode) {
+		// TODO implement backward slicing here
+<span class="fc" id="L66">		ProgramGraph reversedGraph = reverseGraph(computeResult());</span>
+<span class="fc" id="L67">		Set&lt;Node&gt; slicedNodes = (Set&lt;Node&gt;) reversedGraph.getTransitiveSuccessors(pNode);</span>
+<span class="fc" id="L68">		slicedNodes.add(pNode);</span>
+<span class="fc" id="L69">		return slicedNodes;</span>
+	}
+
+	/**
+	 * initialize the dataGraphDependency for each node of CFG we first check if it
+	 * has variables, if so we get the use variables in this node we get all the
+	 * predecessors of the node filter the predecessors to get only the nodes with a
+	 * definition of the use variable get the reaching definitions from all the
+	 * definitions
+	 * 
+	 * @return dataDependenceGraph the graph representing the data-dependence graph
+	 *         of the control-flow graph
+	 */
+
+	public ProgramGraph computeDataDependenceGraph() {
+
+<span class="fc" id="L85">		final ProgramGraph dataDependenceGraph = new ProgramGraph();</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">		for (Node node : controlFlowProgramGraph.getNodes()) {</span>
+<span class="fc" id="L87">			dataDependenceGraph.addNode(node);</span>
+<span class="fc" id="L88">		}</span>
+		
+<span class="fc bfc" id="L90" title="All 2 branches covered.">		for (Node node : controlFlowProgramGraph.getNodes()) {</span>
+<span class="fc bfc" id="L91" title="All 4 branches covered.">			if (node.equals(controlFlowProgramGraph.getEntry()) || node.equals(controlFlowProgramGraph.getExit()))</span>
+<span class="fc" id="L92">				continue;</span>
+			try {
+<span class="fc" id="L94">				Set&lt;Variable&gt; UseVariables = (Set&lt;Variable&gt;) DataFlowAnalysis.usedBy(super.classNode.toString(),</span>
+<span class="fc" id="L95">						super.methodNode, node.getInstruction());</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">				if (UseVariables.isEmpty())</span>
+<span class="fc" id="L97">					continue;</span>
+<span class="fc" id="L98">				Set&lt;Node&gt; predecessorsNodes = computePredecessors(node);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">				for (Variable useVar : UseVariables) {</span>
+<span class="fc" id="L100">					Set&lt;Node&gt; reachedDefinitions = Sets.newHashSet();</span>
+<span class="fc" id="L101">					Set&lt;Node&gt; definitionsList = Sets.newHashSet();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">					for (Node pre : predecessorsNodes) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">						if (pre.equals(controlFlowProgramGraph.getEntry()))</span>
+<span class="fc" id="L104">							continue;</span>
+<span class="fc" id="L105">						if (!(DataFlowAnalysis</span>
+<span class="fc" id="L106">								.definedBy(super.classNode.toString(), super.methodNode, pre.getInstruction())</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">								.isEmpty())</span>
+								&amp;&amp; (DataFlowAnalysis
+<span class="fc" id="L109">										.definedBy(super.classNode.toString(), super.methodNode, pre.getInstruction())</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">										.contains(useVar))) {</span>
+<span class="fc" id="L111">							definitionsList.add(pre);</span>
+						}
+<span class="fc" id="L113">					}</span>
+<span class="fc" id="L114">					reachedDefinitions = computeReachingDefinitions(definitionsList, node);</span>
+
+<span class="fc bfc" id="L116" title="All 2 branches covered.">					for (Node reachedDef : reachedDefinitions) {</span>
+<span class="fc" id="L117">						dataDependenceGraph.addEdge(reachedDef, node);</span>
+<span class="fc" id="L118">					}</span>
+<span class="fc" id="L119">				}</span>
+			}
+
+<span class="nc" id="L122">			catch (AnalyzerException e) {</span>
+				// TODO Auto-generated catch block
+<span class="nc" id="L124">				e.printStackTrace();</span>
+<span class="fc" id="L125">			}</span>
+<span class="fc" id="L126">		}</span>
+
+<span class="fc" id="L128">		return dataDependenceGraph;</span>
+	}
+
+	/**
+	 * Compute the set of reaching definitions of a variable used in a node
+	 * 
+	 * @param definitionsList Set of all definition of a use variable
+	 * @param node            The node contains the use variable
+	 * @return reachedDefinitions A set of nodes of reaching definitions
+	 */
+
+	private Set&lt;Node&gt; computeReachingDefinitions(Set&lt;Node&gt; definitionsList, Node node) {
+
+<span class="fc" id="L141">		Set&lt;Node&gt; reachedDefinitions = Sets.newHashSet();</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">		if (definitionsList.size() == 1) {</span>
+<span class="fc" id="L143">			reachedDefinitions.add(definitionsList.iterator().next());</span>
+		} else {
+<span class="fc bfc" id="L145" title="All 2 branches covered.">			for (Node def1 : definitionsList) {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">				for (Node def2 : definitionsList) {</span>
+<span class="fc bfc" id="L147" title="All 4 branches covered.">					if (def1.equals(def2) || containsTransitiveSuccessors(def1, def2, node)) {</span>
+<span class="fc" id="L148">						continue;</span>
+					} else {
+<span class="fc" id="L150">						reachedDefinitions.add(def1);</span>
+					}
+<span class="fc" id="L152">				}</span>
+<span class="fc" id="L153">			}</span>
+		}
+<span class="fc" id="L155">		return reachedDefinitions;</span>
+	}
+
+	/**
+	 * Compute the set of all predecessors of a node
+	 * 
+	 * @param node The node to calculate the predecessors for.
+	 * @return predecessorsNodes A set of nodes of all predecessors
+	 */
+
+	public Set&lt;Node&gt; computePredecessors(Node node) {
+<span class="fc" id="L166">		ProgramGraph reversedGraph = reverseGraph(controlFlowProgramGraph);</span>
+<span class="fc" id="L167">		Set&lt;Node&gt; predecessorsNodes = (Set&lt;Node&gt;) reversedGraph.getTransitiveSuccessors(node);</span>
+
+<span class="fc" id="L169">		return predecessorsNodes;</span>
+
+	}
+
+	/**
+	 * Reveres the target graph
+	 * 
+	 * @param graph the graph to be traversed
+	 * @return reversedGraph the traversed graph
+	 */
+
+	 ProgramGraph reverseGraph(final ProgramGraph graph) {
+
+<span class="fc" id="L182">		final ProgramGraph reversedGraph = new ProgramGraph();</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">		for (Node node : graph.getNodes()) {</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">			if (node.equals(graph.getEntry())) {</span>
+<span class="fc" id="L185">				continue;</span>
+			}
+<span class="fc" id="L187">			reversedGraph.addNode(node);</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">			for (Node pre : graph.getPredecessors(node)) {</span>
+<span class="fc" id="L189">				reversedGraph.addNode(pre);</span>
+<span class="fc" id="L190">				reversedGraph.addEdge(node, pre);</span>
+<span class="fc" id="L191">			}</span>
+<span class="fc" id="L192">		}</span>
+<span class="fc" id="L193">		return reversedGraph;</span>
+	}
+
+	/**
+	 * check if there a node between tow nodes
+	 * 
+	 * @param pStartNode  the start node
+	 * @param pFirstNode  the node in between
+	 * @param pSecondNode the end node
+	 * @return true if the first node is in between and false if not
+	 */
+
+	private boolean containsTransitiveSuccessors(final Node pStartNode, final Node pFirstNode, final Node pSecondNode) {
+
+<span class="fc" id="L207">		Collection&lt;Node&gt; transitiveSuccessors = controlFlowProgramGraph.getTransitiveSuccessors(pStartNode);</span>
+<span class="fc" id="L208">		transitiveSuccessors.add(pStartNode);</span>
+<span class="fc" id="L209">		boolean not_loop = false;</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">		if (pStartNode.getLineNumber() &lt; pFirstNode.getLineNumber()</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">				&amp;&amp; pFirstNode.getLineNumber() &lt; pSecondNode.getLineNumber())</span>
+<span class="fc" id="L212">			not_loop = true;</span>
+<span class="pc bpc" id="L213" title="1 of 6 branches missed.">		return transitiveSuccessors.contains(pFirstNode) &amp;&amp; transitiveSuccessors.contains(pSecondNode) &amp;&amp; not_loop;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

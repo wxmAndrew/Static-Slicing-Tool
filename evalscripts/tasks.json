@@ -1,0 +1,60 @@
+{
+  "tasks": [
+    {
+      "name": "Calculator",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "Calculator",
+      "method": "evaluate:(Ljava/lang/String;)I",
+      "line": 8,
+      "variable": "sum"
+    },
+    {
+      "name": "Complex",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "Complex",
+      "method": "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;",
+      "line": 79,
+      "variable": "imag"
+    },
+    {
+      "name": "GCD",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "GCD",
+      "method": "gcd:(II)I",
+      "line": 9,
+      "variable": "x"
+    },
+    {
+      "name": "NestedLoop",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "NestedLoop",
+      "method": "nestedWhileForLoops:()I",
+      "line": 28,
+      "variable": "i"
+    },
+    {
+      "name": "Rational",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "Rational",
+      "method": "ofString:(Ljava/lang/String;)Lde/uni_passau/fim/se2/examples/Rational;",
+      "line": 117,
+      "variable": "den"
+    },
+    {
+      "name": "SimpleInteger",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "SimpleInteger",
+      "method": "foo:()I",
+      "line": 10,
+      "variable": "d"
+    },
+    {
+      "name": "TestClass",
+      "package": "de.uni_passau.fim.se2.examples",
+      "class": "TestClass",
+      "method": "countFoos:(I)I",
+      "line": 28,
+      "variable": "numFoos"
+    }
+  ]
+}

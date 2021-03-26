@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Main-Class: de.uni_passau.fim.se2.SlicerMain
+Implementation-Title: Slicer
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: alaa
+Built-Date: Wed May 27 20:27:20 CEST 2020
+Built-JDK: 11.0.6
+

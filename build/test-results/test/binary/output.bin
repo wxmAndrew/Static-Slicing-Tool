@@ -1,0 +1,45 @@
+43
+43*Testing expected-results/Calculator.txt:1
+43]-c de.uni_passau.fim.se2.examples.Calculator -m "evaluate:(Ljava/lang/String;)I" -l 8 -v sum
+43
+43*Testing expected-results/Calculator.txt:2
+43ù-c de.uni_passau.fim.se2.examples.Calculator -m "evaluate:(Ljava/lang/String;)I" -l 8 -v sum -s src/main/java/de/uni_passau/fim/se2/examples/Calculator.java
+45
+45'Testing expected-results/Complex.txt:1
+45ô-c de.uni_passau.fim.se2.examples.Complex -m "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;" -l 79 -v imag
+45
+45'Testing expected-results/Complex.txt:2
+45÷-c de.uni_passau.fim.se2.examples.Complex -m "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;" -l 79 -v imag -s src/main/java/de/uni_passau/fim/se2/examples/Complex.java
+46
+46#Testing expected-results/GCD.txt:1
+46?-c de.uni_passau.fim.se2.examples.GCD -m "gcd:(II)I" -l 9 -v x
+46
+46#Testing expected-results/GCD.txt:2
+46x-c de.uni_passau.fim.se2.examples.GCD -m "gcd:(II)I" -l 9 -v x -s src/main/java/de/uni_passau/fim/se2/examples/GCD.java
+47
+47*Testing expected-results/NestedLoop.txt:1
+47U-c de.uni_passau.fim.se2.examples.NestedLoop -m "nestedWhileForLoops:()I" -l 28 -v i
+47
+47*Testing expected-results/NestedLoop.txt:2
+47ï-c de.uni_passau.fim.se2.examples.NestedLoop -m "nestedWhileForLoops:()I" -l 28 -v i -s src/main/java/de/uni_passau/fim/se2/examples/NestedLoop.java
+48
+48(Testing expected-results/Rational.txt:1
+48√-c de.uni_passau.fim.se2.examples.Rational -m "ofString:(Ljava/lang/String;)Lde/uni_passau/fim/se2/examples/Rational;" -l 117 -v den -s src/main/java/de/uni_passau/fim/se2/examples/Rational.java
+49
+49-Testing expected-results/SimpleInteger.txt:1
+49H-c de.uni_passau.fim.se2.examples.SimpleInteger -m "foo:()I" -l 10 -v d
+49
+49-Testing expected-results/SimpleInteger.txt:2
+49ã-c de.uni_passau.fim.se2.examples.SimpleInteger -m "foo:()I" -l 10 -v d -s src/main/java/de/uni_passau/fim/se2/examples/SimpleInteger.java
+4:
+4:)Testing expected-results/TestClass.txt:1
+4:Q-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 28 -v numFoos
+4:
+4:)Testing expected-results/TestClass.txt:2
+4:V-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 27 -v arbitraryInt
+4:
+4:)Testing expected-results/TestClass.txt:3
+4:ï-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 27 -v arbitraryInt -s src/main/java/de/uni_passau/fim/se2/examples/TestClass.java
+4:
+4:)Testing expected-results/TestClass.txt:4
+4:ê-c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 28 -v numFoos -s src/main/java/de/uni_passau/fim/se2/examples/TestClass.java

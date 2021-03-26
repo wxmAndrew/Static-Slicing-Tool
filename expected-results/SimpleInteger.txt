@@ -1,0 +1,22 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.SimpleInteger -m "foo:()I" -l 10 -v d
+
+Result:
+(line:    6, id:    4)  ISTORE 1
+(line:    7, id:    8)  ISTORE 2
+(line:    8, id:   14)  ISTORE 3
+(line:    9, id:   18)  ISTORE 2
+(line:   10, id:   24)  ISTORE 4
+
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.SimpleInteger -m "foo:()I" -l 10 -v d -s src/main/java/de/uni_passau/fim/se2/examples/SimpleInteger.java
+
+Result:
+int a = 23;
+int b = 42;
+int c = a + b;
+b = 12;
+int d = b - c;
+

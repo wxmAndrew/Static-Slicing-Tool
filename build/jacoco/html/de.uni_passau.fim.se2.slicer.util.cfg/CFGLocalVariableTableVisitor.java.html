@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CFGLocalVariableTableVisitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">slicer</a> &gt; <a href="index.source.html" class="el_package">de.uni_passau.fim.se2.slicer.util.cfg</a> &gt; <span class="el_source">CFGLocalVariableTableVisitor.java</span></div><h1>CFGLocalVariableTableVisitor.java</h1><pre class="source lang-java linenums">package de.uni_passau.fim.se2.slicer.util.cfg;
+
+import static org.objectweb.asm.Opcodes.ASM7;
+
+import com.google.common.collect.Maps;
+import java.util.Map;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+
+/**
+ * A class visitor that extracts the information of the local variable table for each method of a
+ * class.
+ *
+ * @see LocalVariableTable
+ * @see ClassVisitor
+ */
+public class CFGLocalVariableTableVisitor extends ClassVisitor {
+
+  private final Map&lt;String, LocalVariableTable&gt; localVariables;
+
+  public CFGLocalVariableTableVisitor() {
+<span class="fc" id="L23">    super(ASM7);</span>
+<span class="fc" id="L24">    localVariables = Maps.newLinkedHashMap();</span>
+<span class="fc" id="L25">  }</span>
+
+  /** {@inheritDoc} */
+  @Override
+  public MethodVisitor visitMethod(
+      final int pAccess,
+      final String pName,
+      final String pDescriptor,
+      final String pSignature,
+      final String[] pExceptions) {
+    final MethodVisitor mv;
+<span class="fc bfc" id="L36" title="All 2 branches covered.">    if (cv != null) {</span>
+<span class="fc" id="L37">      mv = cv.visitMethod(pAccess, pName, pDescriptor, pSignature, pExceptions);</span>
+    } else {
+<span class="fc" id="L39">      mv = null;</span>
+    }
+<span class="fc" id="L41">    return new CFGLocalVariableTableMethodVisitor(</span>
+        this, mv, pName, pDescriptor, pSignature, pExceptions);
+  }
+
+  /**
+   * Returns the information of the local variable tables for each method in a map of method name
+   * and {@link LocalVariableTable}.
+   *
+   * @return A map of method name to {@link LocalVariableTable}
+   */
+  public Map&lt;String, LocalVariableTable&gt; getLocalVariables() {
+<span class="fc" id="L52">    return localVariables;</span>
+  }
+
+  private static class CFGLocalVariableTableMethodVisitor extends MethodVisitor {
+
+    private final String name;
+    private final String descriptor;
+    private final String signature;
+    private final String[] exceptions;
+    private final LocalVariableTable localVariableTable;
+    private final CFGLocalVariableTableVisitor classVisitor;
+
+    CFGLocalVariableTableMethodVisitor(
+        final CFGLocalVariableTableVisitor pClassVisitor,
+        final MethodVisitor pMethodVisitor,
+        final String pName,
+        final String pDescriptor,
+        final String pSignature,
+        final String[] pExceptions) {
+<span class="fc" id="L71">      super(ASM7, pMethodVisitor);</span>
+<span class="fc" id="L72">      classVisitor = pClassVisitor;</span>
+<span class="fc" id="L73">      name = pName;</span>
+<span class="fc" id="L74">      descriptor = pDescriptor;</span>
+<span class="fc" id="L75">      signature = pSignature;</span>
+<span class="fc" id="L76">      exceptions = pExceptions;</span>
+<span class="fc" id="L77">      localVariableTable = new LocalVariableTable();</span>
+<span class="fc" id="L78">    }</span>
+
+    /** {@inheritDoc} */
+    @Override
+    public void visitLocalVariable(
+        final String pName,
+        final String pDescriptor,
+        final String pSignature,
+        final Label pStart,
+        final Label pEnd,
+        final int pIndex) {
+<span class="fc" id="L89">      final LocalVariable variable = new LocalVariable(pName, pDescriptor, pSignature, pIndex);</span>
+<span class="fc" id="L90">      localVariableTable.addEntry(pIndex, variable);</span>
+<span class="fc" id="L91">      super.visitLocalVariable(pName, pDescriptor, pSignature, pStart, pEnd, pIndex);</span>
+<span class="fc" id="L92">    }</span>
+
+    /** {@inheritDoc} */
+    @Override
+    public void visitEnd() {
+<span class="fc" id="L97">      final String methodName =</span>
+<span class="fc" id="L98">          CFGExtractor.computeInternalMethodName(name, descriptor, signature, exceptions);</span>
+<span class="fc" id="L99">      classVisitor.localVariables.put(methodName, localVariableTable);</span>
+<span class="fc" id="L100">    }</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

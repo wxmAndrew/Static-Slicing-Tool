@@ -1,0 +1,9 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.Rational -m "ofString:(Ljava/lang/String;)Lde/uni_passau/fim/se2/examples/Rational;" -l 117 -v den -s src/main/java/de/uni_passau/fim/se2/examples/Rational.java
+
+Result:
+public static Rational ofString(String s) {
+int idx = s.indexOf('/');
+if (idx == -1) { // No slash found.
+den = new BigInteger(s.substring(idx + 1, s.length()));
+

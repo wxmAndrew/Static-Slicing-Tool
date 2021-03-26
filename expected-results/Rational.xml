@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+  <line nr="-1" id="1" instruction="L0"/>
+  <line nr="109" id="6" instruction="ISTORE 1"/>
+  <line nr="112" id="11" instruction="IF_ICMPNE L0"/>
+  <line nr="117" id="36" instruction="ASTORE 3"/>
+</report>

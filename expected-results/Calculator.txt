@@ -1,0 +1,24 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.Calculator -m "evaluate:(Ljava/lang/String;)I" -l 8 -v sum
+
+Result:
+(line:   -1, id:    1)  L0
+(line:    6, id:    4)  ISTORE 2
+(line:    7, id:   13)  ISTORE 4
+(line:    7, id:   15)  ISTORE 5
+(line:    7, id:   39)  IINC 5 1
+(line:    7, id:   29)  ASTORE 6
+(line:    7, id:   20)  IF_ICMPGE L0
+(line:    7, id:   10)  ASTORE 3
+(line:    8, id:   36)  ISTORE 2
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.Calculator -m "evaluate:(Ljava/lang/String;)I" -l 8 -v sum -s src/main/java/de/uni_passau/fim/se2/examples/Calculator.java
+
+Result:
+public int evaluate(String pExpression) {
+int sum = 0;
+for (String summand : pExpression.split("\\+")) {
+sum += Integer.parseInt(summand);
+

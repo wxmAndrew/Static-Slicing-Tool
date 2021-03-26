@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.uni_passau.fim.se2.slicer.analysis.PostDominatorTreeTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-05-27T18:27:25" hostname="ENVY-x360" time="0.067">
+  <properties/>
+  <testcase name="test_reverseGraph()" classname="de.uni_passau.fim.se2.slicer.analysis.PostDominatorTreeTest" time="0.007"/>
+  <testcase name="test_computeResult()" classname="de.uni_passau.fim.se2.slicer.analysis.PostDominatorTreeTest" time="0.048"/>
+  <testcase name="test_computeDominance()" classname="de.uni_passau.fim.se2.slicer.analysis.PostDominatorTreeTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

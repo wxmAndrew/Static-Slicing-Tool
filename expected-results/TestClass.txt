@@ -1,0 +1,49 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 28 -v numFoos
+
+Result:
+(line:   -1, id:    1)  L0
+(line:   19, id:    4)  ISTORE 2
+(line:   20, id:    8)  ISTORE 3
+(line:   21, id:   11)  IINC 3 10
+(line:   22, id:   16)  IFLE L0
+(line:   23, id:   36)  IFNE L0
+(line:   24, id:   39)  IINC 2 1
+(line:   27, id:   21)  IINC 3 -15
+(line:   28, id:   27)  ISTORE 2
+
+
+
+Command Line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 27 -v arbitraryInt
+
+Result:
+(line:   20, id:    8)  ISTORE 3
+(line:   21, id:   11)  IINC 3 10
+(line:   27, id:   21)  IINC 3 -15
+
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 27 -v arbitraryInt -s src/main/java/de/uni_passau/fim/se2/examples/TestClass.java
+
+Result:
+int arbitraryInt = 5;
+arbitraryInt += 10;
+arbitraryInt -= 15;
+
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.TestClass -m "countFoos:(I)I" -l 28 -v numFoos -s src/main/java/de/uni_passau/fim/se2/examples/TestClass.java
+
+Result:
+public int countFoos(int input) {
+int numFoos = 0;
+int arbitraryInt = 5;
+arbitraryInt += 10;
+while (input > 0) {
+if (input % 3 == 0) {
+numFoos += 1;
+arbitraryInt -= 15;
+numFoos = numFoos + arbitraryInt;

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlicerMain.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">slicer</a> &gt; <a href="index.source.html" class="el_package">de.uni_passau.fim.se2</a> &gt; <span class="el_source">SlicerMain.java</span></div><h1>SlicerMain.java</h1><pre class="source lang-java linenums">package de.uni_passau.fim.se2;
+
+import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.Var;
+import de.uni_passau.fim.se2.slicer.analysis.ProgramDependenceGraph;
+import de.uni_passau.fim.se2.slicer.util.cfg.CFGLocalVariableTableVisitor;
+import de.uni_passau.fim.se2.slicer.util.cfg.LocalVariable;
+import de.uni_passau.fim.se2.slicer.util.cfg.LocalVariableTable;
+import de.uni_passau.fim.se2.slicer.util.cfg.Node;
+import de.uni_passau.fim.se2.slicer.util.cfg.ProgramGraph;
+import de.uni_passau.fim.se2.slicer.util.output.ByteCodeExtractor;
+import de.uni_passau.fim.se2.slicer.util.output.Extractor;
+import de.uni_passau.fim.se2.slicer.util.output.SourceLineExtractor;
+import de.uni_passau.fim.se2.slicer.util.output.XMLFileExtractor;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IincInsnNode;
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
+
+public class SlicerMain {
+  private String className;
+  private String methodName;
+  private String methodDescriptor;
+  private int lineNumber;
+  private String variableName;
+  private String sourceFilePath;
+  private String targetFilePath;
+<span class="fc" id="L45">  private boolean xmlExtraction = false;</span>
+  private Map&lt;String, LocalVariableTable&gt; localVariableTables;
+  private MethodNode methodNode;
+
+  public static void main(final String[] pArgs) throws IOException {
+<span class="fc" id="L50">    SlicerMain slicerMain = new SlicerMain();</span>
+<span class="fc" id="L51">    slicerMain.parseArguments(pArgs);</span>
+<span class="fc" id="L52">    slicerMain.run();</span>
+<span class="fc" id="L53">  }</span>
+
+  /** Prevent initialisation of class */
+<span class="fc" id="L56">  private SlicerMain() {}</span>
+
+  private void run() throws IOException {
+<span class="fc" id="L59">    final Set&lt;Node&gt; backwardSlice = executeSlicing();</span>
+
+    final Extractor extractor;
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (sourceFilePath != null) {</span>
+<span class="fc" id="L63">      extractor =</span>
+          new SourceLineExtractor(
+<span class="fc" id="L65">              Paths.get(sourceFilePath), localVariableTables, className, methodNode, backwardSlice);</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    } else if (xmlExtraction) {</span>
+<span class="nc" id="L67">      extractor = new XMLFileExtractor(backwardSlice);</span>
+    } else {
+<span class="fc" id="L69">      extractor = new ByteCodeExtractor(backwardSlice);</span>
+    }
+
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    if (targetFilePath == null) {</span>
+<span class="fc" id="L73">      System.out.println(extractor.extract());</span>
+    } else {
+<span class="nc" id="L75">      extractor.extractToFile(Paths.get(targetFilePath));</span>
+    }
+<span class="fc" id="L77">  }</span>
+
+  private Set&lt;Node&gt; executeSlicing() throws IOException {
+<span class="fc" id="L80">    final ClassNode classNode = new ClassNode(Opcodes.ASM7);</span>
+<span class="fc" id="L81">    final ClassReader classReader = new ClassReader(className);</span>
+<span class="fc" id="L82">    classReader.accept(classNode, 0);</span>
+
+<span class="fc" id="L84">    final CFGLocalVariableTableVisitor localVariableTableVisitor =</span>
+        new CFGLocalVariableTableVisitor();
+<span class="fc" id="L86">    classReader.accept(localVariableTableVisitor, 0);</span>
+<span class="fc" id="L87">    localVariableTables = localVariableTableVisitor.getLocalVariables();</span>
+
+<span class="fc" id="L89">    methodNode =</span>
+        classNode
+            .methods
+<span class="fc" id="L92">            .stream()</span>
+<span class="fc" id="L93">            .filter(</span>
+<span class="pc bpc" id="L94" title="1 of 4 branches missed.">                method -&gt; methodName.equals(method.name) &amp;&amp; methodDescriptor.equals(method.desc))</span>
+<span class="fc" id="L95">            .findAny()</span>
+<span class="fc" id="L96">            .orElse(null);</span>
+
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    Preconditions.checkState(methodNode != null, &quot;Could not find an appropriate method!&quot;);</span>
+
+<span class="fc" id="L100">    final ProgramDependenceGraph pdg = new ProgramDependenceGraph(classNode, methodNode);</span>
+<span class="fc" id="L101">    final Node programLocation =</span>
+<span class="fc" id="L102">        getProgramLocation(</span>
+<span class="fc" id="L103">            pdg.getControlFlowProgramGraph(),</span>
+            methodNode,
+<span class="fc" id="L105">            localVariableTables.get(methodName + &quot;: &quot; + methodDescriptor),</span>
+            lineNumber,
+            variableName);
+
+<span class="fc" id="L109">    return pdg.backwardSlice(programLocation);</span>
+  }
+
+  private Node getProgramLocation(
+      final ProgramGraph controlFlowProgramGraph,
+      final MethodNode methodNode,
+      final LocalVariableTable localVariableTable,
+      final int lineNumber,
+      final String variableName) {
+<span class="fc" id="L118">    @Var AbstractInsnNode searched = null;</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    for (final AbstractInsnNode insnNode : methodNode.instructions) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">      if (insnNode instanceof LineNumberNode) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (((LineNumberNode) insnNode).line == lineNumber) {</span>
+<span class="fc" id="L122">          searched = insnNode;</span>
+<span class="fc" id="L123">          break;</span>
+        }
+      }
+<span class="fc" id="L126">    }</span>
+
+<span class="fc" id="L128">    @Var Node cfgNode = null;</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">    if (searched != null) {</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">      for (Node node : controlFlowProgramGraph.getNodes()) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (node.getInstruction().equals(searched)) {</span>
+<span class="fc" id="L132">          cfgNode = node;</span>
+<span class="fc" id="L133">          break;</span>
+        }
+<span class="fc" id="L135">      }</span>
+    }
+
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">    for (Node successor : controlFlowProgramGraph.getSuccessorsUntilNextLineNumber(cfgNode)) {</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">      if ((successor.getInstruction() instanceof VarInsnNode</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">              || successor.getInstruction() instanceof IincInsnNode)</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">          &amp;&amp; isStoreOpCode(successor.getInstruction().getOpcode())) {</span>
+        // For a local variable search in the local-variable table if we find a candidate
+        final int idx;
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (successor.getInstruction() instanceof VarInsnNode) {</span>
+<span class="fc" id="L145">          idx = ((VarInsnNode) successor.getInstruction()).var;</span>
+        } else {
+<span class="fc" id="L147">          idx = ((IincInsnNode) successor.getInstruction()).var;</span>
+        }
+<span class="fc" id="L149">        final Optional&lt;LocalVariable&gt; entry = localVariableTable.getEntry(idx);</span>
+<span class="pc bpc" id="L150" title="2 of 4 branches missed.">        if (entry.isPresent() &amp;&amp; entry.get().getName().equals(variableName)) {</span>
+<span class="fc" id="L151">          return successor;</span>
+        }
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">      } else if (successor.getInstruction() instanceof FieldInsnNode</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">          &amp;&amp; (isFieldOpCode(successor.getInstruction().getOpcode()))) {</span>
+        // For a field access compare the name directly
+<span class="nc" id="L156">        final String instructionVariableName = ((FieldInsnNode) successor.getInstruction()).name;</span>
+<span class="nc bnc" id="L157" title="All 4 branches missed.">        if (instructionVariableName != null &amp;&amp; instructionVariableName.equals(variableName)) {</span>
+<span class="nc" id="L158">          return successor;</span>
+        }
+      }
+<span class="fc" id="L161">    }</span>
+<span class="nc" id="L162">    throw new IllegalStateException(</span>
+        &quot;We were not able to determine a correct program location for the searched node&quot;);
+  }
+
+  private boolean isStoreOpCode(final int pOpCode) {
+<span class="pc bpc" id="L167" title="10 of 28 branches missed.">    return pOpCode == Opcodes.AASTORE</span>
+        || pOpCode == Opcodes.ASTORE
+        || pOpCode == Opcodes.SASTORE
+        || pOpCode == Opcodes.BASTORE
+        || pOpCode == Opcodes.CASTORE
+        || pOpCode == Opcodes.DASTORE
+        || pOpCode == Opcodes.DSTORE
+        || pOpCode == Opcodes.FASTORE
+        || pOpCode == Opcodes.FSTORE
+        || pOpCode == Opcodes.IASTORE
+        || pOpCode == Opcodes.ISTORE
+        || pOpCode == Opcodes.LASTORE
+        || pOpCode == Opcodes.LSTORE
+        || pOpCode == Opcodes.IINC;
+  }
+
+  private boolean isFieldOpCode(final int pOpCode) {
+<span class="nc bnc" id="L184" title="All 4 branches missed.">    return pOpCode == Opcodes.PUTFIELD || pOpCode == Opcodes.PUTSTATIC;</span>
+  }
+
+  private void parseArguments(final String[] pArgs) {
+<span class="fc" id="L188">    final Options options = new Options();</span>
+
+<span class="fc" id="L190">    final Option classNameOption = new Option(&quot;c&quot;, &quot;class&quot;, true, &quot;Path to the class file&quot;);</span>
+<span class="fc" id="L191">    classNameOption.setRequired(false);</span>
+<span class="fc" id="L192">    options.addOption(classNameOption);</span>
+
+<span class="fc" id="L194">    final Option variableNameOption = new Option(&quot;v&quot;, &quot;variablename&quot;, true, &quot;Name of variable&quot;);</span>
+<span class="fc" id="L195">    variableNameOption.setRequired(true);</span>
+<span class="fc" id="L196">    options.addOption(variableNameOption);</span>
+
+<span class="fc" id="L198">    final Option methodOption =</span>
+        new Option(&quot;m&quot;, &quot;method&quot;, true, &quot;Methodname and descriptor of the method&quot;);
+<span class="fc" id="L200">    methodOption.setRequired(true);</span>
+<span class="fc" id="L201">    options.addOption(methodOption);</span>
+
+<span class="fc" id="L203">    final Option lineNumberOption =</span>
+        new Option(&quot;l&quot;, &quot;linenumber&quot;, true, &quot;Line number where to start the slice&quot;);
+<span class="fc" id="L205">    methodOption.setRequired(true);</span>
+<span class="fc" id="L206">    options.addOption(lineNumberOption);</span>
+
+<span class="fc" id="L208">    final Option sourceFileOption =</span>
+        new Option(&quot;s&quot;, &quot;sourcefile&quot;, true, &quot;Path to the class file's source code&quot;);
+<span class="fc" id="L210">    sourceFileOption.setRequired(false);</span>
+<span class="fc" id="L211">    options.addOption(sourceFileOption);</span>
+
+<span class="fc" id="L213">    final Option targetFileOption =</span>
+        new Option(
+            &quot;t&quot;, &quot;targetfile&quot;, true, &quot;Path to a target file where to write the slice code to&quot;);
+<span class="fc" id="L216">    targetFileOption.setRequired(false);</span>
+<span class="fc" id="L217">    options.addOption(targetFileOption);</span>
+
+<span class="fc" id="L219">    final Option xmlExtractionOption =</span>
+        new Option(&quot;x&quot;, &quot;xmlfile&quot;, false, &quot;Extracts the result as an XML file for grading&quot;);
+<span class="fc" id="L221">    xmlExtractionOption.setRequired(false);</span>
+<span class="fc" id="L222">    options.addOption(xmlExtractionOption);</span>
+
+<span class="fc" id="L224">    final CommandLineParser parser = new DefaultParser();</span>
+<span class="fc" id="L225">    final HelpFormatter formatter = new HelpFormatter();</span>
+    final CommandLine cmd;
+
+    try {
+<span class="fc" id="L229">      cmd = parser.parse(options, pArgs);</span>
+<span class="nc" id="L230">    } catch (final ParseException pE) {</span>
+      // TODO can we handle this more beautiful?
+<span class="nc" id="L232">      System.err.println(pE.getMessage());</span>
+<span class="nc" id="L233">      formatter.printHelp(&quot;slicer&quot;, options);</span>
+<span class="nc" id="L234">      System.exit(1);</span>
+<span class="nc" id="L235">      return; // Should not be necessary but pacifies the IntelliJ inspections</span>
+<span class="fc" id="L236">    }</span>
+
+<span class="fc" id="L238">    variableName = cmd.getOptionValue(&quot;variablename&quot;);</span>
+<span class="fc" id="L239">    className = cmd.getOptionValue(&quot;class&quot;);</span>
+<span class="fc" id="L240">    final String[] methodInput = cmd.getOptionValue(&quot;method&quot;).split(&quot;:&quot;);</span>
+<span class="fc" id="L241">    methodName = methodInput[0];</span>
+<span class="fc" id="L242">    methodDescriptor = methodInput[1];</span>
+<span class="fc" id="L243">    lineNumber = Integer.parseInt(cmd.getOptionValue(&quot;linenumber&quot;));</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">    if (cmd.hasOption(&quot;sourcefile&quot;)) {</span>
+<span class="fc" id="L245">      sourceFilePath = cmd.getOptionValue(&quot;sourcefile&quot;);</span>
+    }
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">    if (cmd.hasOption(&quot;targetfile&quot;)) {</span>
+<span class="nc" id="L248">      targetFilePath = cmd.getOptionValue(&quot;targetfile&quot;);</span>
+    }
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">    if (cmd.hasOption(&quot;xmlfile&quot;)) {</span>
+<span class="nc" id="L251">      xmlExtraction = true;</span>
+    }
+<span class="fc" id="L253">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

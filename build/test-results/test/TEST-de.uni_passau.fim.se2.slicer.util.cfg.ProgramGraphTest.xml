@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.uni_passau.fim.se2.slicer.util.cfg.ProgramGraphTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-05-27T18:27:24" hostname="ENVY-x360" time="0.049">
+  <properties/>
+  <testcase name="test_getLeastCommonAncestor()" classname="de.uni_passau.fim.se2.slicer.util.cfg.ProgramGraphTest" time="0.049"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

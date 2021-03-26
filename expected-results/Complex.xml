@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+  <line nr="-1" id="1" instruction="L0"/>
+  <line nr="74" id="7" instruction="DSTORE 4"/>
+  <line nr="78" id="37" instruction="DSTORE 4"/>
+  <line nr="79" id="47" instruction="DSTORE 4"/>
+</report>

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Rational.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">slicer</a> &gt; <a href="index.source.html" class="el_package">de.uni_passau.fim.se2.examples</a> &gt; <span class="el_source">Rational.java</span></div><h1>Rational.java</h1><pre class="source lang-java linenums">package de.uni_passau.fim.se2.examples;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.base.Objects;
+import com.google.errorprone.annotations.Var;
+import com.google.errorprone.annotations.concurrent.LazyInit;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+// From org.sosy-lab.common.rationals
+<span class="nc bnc" id="L12" title="All 2 branches missed.">public class Rational extends Number implements Comparable&lt;Rational&gt; {</span>
+  private static final long serialVersionUID = 1657347377738275521L;
+
+  // -- Just some shortcuts for BigIntegers --
+<span class="nc" id="L16">  private static final BigInteger B_ZERO = BigInteger.ZERO;</span>
+<span class="nc" id="L17">  private static final BigInteger B_ONE = BigInteger.ONE;</span>
+<span class="nc" id="L18">  private static final BigInteger B_M_ONE = B_ONE.negate();</span>
+
+<span class="nc" id="L20">  public static final Rational ZERO = new Rational(B_ZERO, B_ONE);</span>
+<span class="nc" id="L21">  public static final Rational ONE = new Rational(B_ONE, B_ONE);</span>
+<span class="nc" id="L22">  public static final Rational NEG_ONE = new Rational(B_M_ONE, B_ONE);</span>
+
+<span class="nc" id="L24">  @LazyInit private transient String stringCache = null;</span>
+
+  /**
+   * Rationals are always stored in the normal form. That is:
+   *
+   * &lt;p&gt;a) denominator is strictly positive. b) numerator and denominator do not have common
+   * factors. c) 0, 1 and -1 have unique representation corresponding to the class static constants
+   * ZERO, ONE and NEG_ONE. That is, they can be compared using the '==' operator.
+   */
+  private final BigInteger num;
+
+  private final BigInteger den;
+
+<span class="nc" id="L37">  private Rational(BigInteger numerator, BigInteger denominator) {</span>
+<span class="nc" id="L38">    num = numerator;</span>
+<span class="nc" id="L39">    den = denominator;</span>
+<span class="nc bnc" id="L40" title="All 4 branches missed.">    assert den.signum() == 1;</span>
+<span class="nc" id="L41">  }</span>
+
+  // Factory functions.
+
+  /** Create a new rational from a numerator and a denominator. */
+  public static Rational of(@Var BigInteger numerator, @Var BigInteger denominator) {
+<span class="nc" id="L47">    checkNotNull(numerator);</span>
+<span class="nc" id="L48">    int denSignum = denominator.signum();</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">    if (denSignum == 0) {</span>
+<span class="nc" id="L50">      throw new IllegalArgumentException(&quot;Infinity is not supported, use ExtendedRational instead&quot;);</span>
+    }
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">    if (denSignum == -1) {</span>
+      // Make {@code denominator} positive.
+<span class="nc" id="L55">      denominator = denominator.negate();</span>
+<span class="nc" id="L56">      numerator = numerator.negate();</span>
+    }
+
+    // Reduce by GCD. GCD will never be zero as the denominator is never
+    // zero at this stage.
+<span class="nc" id="L61">    BigInteger gcd = numerator.gcd(denominator);</span>
+<span class="nc" id="L62">    numerator = numerator.divide(gcd);</span>
+<span class="nc" id="L63">    denominator = denominator.divide(gcd);</span>
+
+<span class="nc" id="L65">    return ofNormalForm(numerator, denominator);</span>
+  }
+
+  /**
+   * Wrapper around the constructor, returns cached constants if possible. Assumes that &lt;code&gt;num
+   * &lt;/code&gt; and &lt;code&gt;den&lt;/code&gt; are in the normal form.
+   */
+  private static Rational ofNormalForm(BigInteger num, BigInteger den) {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (num.equals(B_ZERO)) {</span>
+<span class="nc" id="L74">      return ZERO;</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">    } else if (den.equals(B_ONE)) {</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">      if (num.equals(B_ONE)) {</span>
+<span class="nc" id="L77">        return ONE;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">      } else if (num.equals(B_M_ONE)) {</span>
+<span class="nc" id="L79">        return NEG_ONE;</span>
+      }
+    }
+<span class="nc" id="L82">    return new Rational(num, den);</span>
+  }
+
+  /** Create a new rational from two longs. */
+  public static Rational ofLongs(long numerator, long denominator) {
+<span class="nc" id="L87">    return of(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));</span>
+  }
+
+  /** Create a new rational equal to the given long. */
+  public static Rational ofLong(long numerator) {
+<span class="nc" id="L92">    return of(BigInteger.valueOf(numerator), B_ONE);</span>
+  }
+
+  /** Create a new rational equal to the given BigInteger. */
+  public static Rational ofBigInteger(BigInteger numerator) {
+<span class="nc" id="L97">    return of(numerator, B_ONE);</span>
+  }
+
+  /**
+   * Reverses the effect of {@link Rational#toString}. Supports 2 different formats: with slash
+   * (e.g. {@code 25/17}) or without slash (e.g. {@code 5})
+   *
+   * @param s Input string
+   * @throws NumberFormatException iff {@code s} is not a valid representation of Rational.
+   * @throws IllegalArgumentException If the resulting rational is undefined (e.g. 0/0 or 1/0).
+   */
+  public static Rational ofString(String s) {
+<span class="nc" id="L109">    int idx = s.indexOf('/');</span>
+    BigInteger num;
+    BigInteger den;
+<span class="nc bnc" id="L112" title="All 2 branches missed.">    if (idx == -1) { // No slash found.</span>
+<span class="nc" id="L113">      num = new BigInteger(s);</span>
+<span class="nc" id="L114">      return ofBigInteger(num);</span>
+    } else {
+<span class="nc" id="L116">      num = new BigInteger(s.substring(0, idx));</span>
+<span class="nc" id="L117">      den = new BigInteger(s.substring(idx + 1, s.length()));</span>
+<span class="nc" id="L118">      return of(num, den);</span>
+    }
+  }
+
+  /**
+   * Syntax sugar helper for creating Rationals.
+   *
+   * @see #ofString(String)
+   */
+  public static Rational of(String s) {
+<span class="nc" id="L128">    return ofString(s);</span>
+  }
+
+  /**
+   * Syntax sugar.
+   *
+   * @see #ofLong(long)
+   */
+  public static Rational of(long l) {
+<span class="nc" id="L137">    return ofLong(l);</span>
+  }
+
+  /** Convert a given BigDecimal to Rational. */
+  public static Rational ofBigDecimal(BigDecimal decimal) {
+<span class="nc bnc" id="L142" title="All 2 branches missed.">    if (decimal.scale() &lt;= 0) {</span>
+<span class="nc" id="L143">      BigInteger num = decimal.toBigInteger();</span>
+<span class="nc" id="L144">      return Rational.of(num, BigInteger.ONE);</span>
+    } else {
+<span class="nc" id="L146">      BigInteger num = decimal.unscaledValue();</span>
+<span class="nc" id="L147">      BigInteger denom = BigInteger.TEN.pow(decimal.scale());</span>
+<span class="nc" id="L148">      return Rational.of(num, denom);</span>
+    }
+  }
+
+  /** Multiply by {@code b}, return a new instance. */
+  @SuppressWarnings(&quot;ReferenceEquality&quot;) // normalized form uses cached instances
+  public Rational times(Rational b) {
+<span class="nc" id="L155">    checkNotNull(b);</span>
+<span class="nc" id="L156">    Rational a = this;</span>
+<span class="nc bnc" id="L157" title="All 4 branches missed.">    if (a == ZERO || b == ZERO) {</span>
+<span class="nc" id="L158">      return ZERO;</span>
+    }
+<span class="nc bnc" id="L160" title="All 2 branches missed.">    if (a == ONE) {</span>
+<span class="nc" id="L161">      return b;</span>
+    }
+<span class="nc bnc" id="L163" title="All 2 branches missed.">    if (b == ONE) {</span>
+<span class="nc" id="L164">      return a;</span>
+    }
+
+    // reduce p1/q2 and p2/q1, then multiply, where a = p1/q1 and b = p2/q2
+<span class="nc" id="L168">    Rational c = of(a.num, b.den);</span>
+<span class="nc" id="L169">    Rational d = of(b.num, a.den);</span>
+<span class="nc" id="L170">    return ofNormalForm(c.num.multiply(d.num), c.den.multiply(d.den));</span>
+  }
+
+  /** Return a new instance equal to the sum of {@code this} and {@code b}. */
+  @SuppressWarnings(&quot;ReferenceEquality&quot;) // normalized form uses cached instances
+  public Rational plus(Rational b) {
+<span class="nc" id="L176">    checkNotNull(b);</span>
+<span class="nc" id="L177">    Rational a = this;</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">    if (a == ZERO) {</span>
+<span class="nc" id="L179">      return b;</span>
+    }
+<span class="nc bnc" id="L181" title="All 2 branches missed.">    if (b == ZERO) {</span>
+<span class="nc" id="L182">      return a;</span>
+    }
+
+<span class="nc" id="L185">    return of(a.num.multiply(b.den).add(b.num.multiply(a.den)), a.den.multiply(b.den));</span>
+  }
+
+  /** Return a new instance equal to {@code this - b}. */
+  public Rational minus(Rational b) {
+<span class="nc" id="L190">    return plus(b.negate());</span>
+  }
+
+  /** Return {@code this / b}. */
+  public Rational divides(Rational b) {
+    // Reciprocal method will throw the exception for the division-by-zero
+    // error if required.
+<span class="nc" id="L197">    return times(b.reciprocal());</span>
+  }
+
+  /**
+   * Return reciprocal of {@code this}.
+   *
+   * @throws IllegalArgumentException If invoked on zero.
+   */
+  public Rational reciprocal() {
+<span class="nc bnc" id="L206" title="All 2 branches missed.">    if (num.equals(B_ZERO)) {</span>
+<span class="nc" id="L207">      throw new IllegalArgumentException(</span>
+          &quot;Division by zero not supported, use ExtendedRational if you need it&quot;);
+    }
+<span class="nc" id="L210">    return of(den, num);</span>
+  }
+
+  /** Return negation of {@code this}. */
+  public Rational negate() {
+<span class="nc" id="L215">    return ofNormalForm(num.negate(), den);</span>
+  }
+
+  @Override
+  public double doubleValue() {
+<span class="nc" id="L220">    return num.doubleValue() / den.doubleValue();</span>
+  }
+
+  public boolean isIntegral() {
+<span class="nc" id="L224">    return den.equals(B_ONE);</span>
+  }
+
+  public BigInteger getNum() {
+<span class="nc" id="L228">    return num;</span>
+  }
+
+  public BigInteger getDen() {
+<span class="nc" id="L232">    return den;</span>
+  }
+
+  /** @return -1, 0 or 1, representing the sign of the rational number. */
+  public int signum() {
+<span class="nc" id="L237">    return num.signum();</span>
+  }
+
+  /** @return Absolute value of {@code this}. */
+  public Rational abs() {
+<span class="nc bnc" id="L242" title="All 2 branches missed.">    return signum() == -1 ? negate() : this;</span>
+  }
+
+  /** @return String of the form num/den. */
+  @Override
+  public String toString() {
+<span class="nc bnc" id="L248" title="All 2 branches missed.">    if (stringCache == null) {</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">      if (den.equals(B_ONE)) {</span>
+<span class="nc" id="L250">        stringCache = num.toString();</span>
+      } else {
+<span class="nc" id="L252">        stringCache = num + &quot;/&quot; + den;</span>
+      }
+    }
+<span class="nc" id="L255">    return stringCache;</span>
+  }
+
+  @Override
+  public int compareTo(Rational b) {
+<span class="nc" id="L260">    BigInteger lhs = num.multiply(b.den);</span>
+<span class="nc" id="L261">    BigInteger rhs = den.multiply(b.num);</span>
+<span class="nc" id="L262">    return lhs.subtract(rhs).signum();</span>
+  }
+
+  @Override
+  public boolean equals(Object y) {
+<span class="nc bnc" id="L267" title="All 2 branches missed.">    if (this == y) {</span>
+<span class="nc" id="L268">      return true;</span>
+    }
+<span class="nc bnc" id="L270" title="All 2 branches missed.">    if (y == null) {</span>
+<span class="nc" id="L271">      return false;</span>
+    }
+<span class="nc bnc" id="L273" title="All 2 branches missed.">    if (y.getClass() != this.getClass()) {</span>
+<span class="nc" id="L274">      return false;</span>
+    }
+<span class="nc" id="L276">    Rational b = (Rational) y;</span>
+<span class="nc bnc" id="L277" title="All 4 branches missed.">    return (num.equals(b.num) &amp;&amp; den.equals(b.den));</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L282">    return Objects.hashCode(num, den);</span>
+  }
+
+  public static Rational max(Rational a, Rational b) {
+<span class="nc bnc" id="L286" title="All 2 branches missed.">    if (a.compareTo(b) &gt;= 0) {</span>
+<span class="nc" id="L287">      return a;</span>
+    }
+<span class="nc" id="L289">    return b;</span>
+  }
+
+  @Override
+  public int intValue() {
+<span class="nc" id="L294">    return (int) doubleValue();</span>
+  }
+
+  @Override
+  public long longValue() {
+<span class="nc" id="L299">    return (long) doubleValue();</span>
+  }
+
+  @Override
+  public float floatValue() {
+<span class="nc" id="L304">    return (float) doubleValue();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

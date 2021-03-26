@@ -1,0 +1,20 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.Complex -m "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;" -l 79 -v imag
+
+Result:
+(line:   -1, id:    1)  L0
+(line:   74, id:    7)  DSTORE 4
+(line:   78, id:   37)  DSTORE 4
+(line:   79, id:   47)  DSTORE 4
+
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.Complex -m "multiply:(Lde/uni_passau/fim/se2/examples/Complex;)Lde/uni_passau/fim/se2/examples/Complex;" -l 79 -v imag -s src/main/java/de/uni_passau/fim/se2/examples/Complex.java
+
+Result:
+public Complex multiply(Complex c) {
+double real = 0.0, imag = 0.0;
+imag += this.real * c.imag;
+imag += this.imag * c.real;
+

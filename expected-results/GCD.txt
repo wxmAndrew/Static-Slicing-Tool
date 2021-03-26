@@ -1,0 +1,21 @@
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.GCD -m "gcd:(II)I" -l 9 -v x
+
+Result:
+(line:   -1, id:    1)  L0
+(line:    7, id:    9)  IFEQ L0
+(line:    8, id:   20)  ISTORE 3
+(line:    9, id:   24)  ISTORE 1
+(line:   10, id:   28)  ISTORE 2
+
+
+
+Command line:
+java -jar build/libs/slicer-1.0-SNAPSHOT.jar -c de.uni_passau.fim.se2.examples.GCD -m "gcd:(II)I" -l 9 -v x -s src/main/java/de/uni_passau/fim/se2/examples/GCD.java
+
+Result:
+public int gcd(int x, int y) {
+while (y != 0) {
+tmp = x % y;
+x = y;
+y = tmp;

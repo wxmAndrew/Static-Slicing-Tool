@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProgramGraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">slicer</a> &gt; <a href="index.source.html" class="el_package">de.uni_passau.fim.se2.slicer.util.cfg</a> &gt; <span class="el_source">ProgramGraph.java</span></div><h1>ProgramGraph.java</h1><pre class="source lang-java linenums">package de.uni_passau.fim.se2.slicer.util.cfg;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.errorprone.annotations.Var;
+import java.util.Collection;
+import java.util.Queue;
+import java.util.Set;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.builder.GraphTypeBuilder;
+import org.objectweb.asm.tree.LineNumberNode;
+
+/** Represents a graph structure. */
+public class ProgramGraph {
+
+  // A facade class to store graphs as DirectedMultiGraphs using the JGraphT framework.
+  // Replaced the DirectedMultiGraph instance by one as described in
+  // https://jgrapht.org/guide/UserOverview#graph-structures, where a DirectedMultiGraph is a graph
+  // with directed edges, no self-loops, multiple edges, and no weighting.
+  private final org.jgrapht.Graph&lt;Node, DefaultEdge&gt; graph;
+
+<span class="fc" id="L22">  public ProgramGraph() {</span>
+<span class="fc" id="L23">    Node.sNextId = 1;</span>
+<span class="fc" id="L24">    graph =</span>
+<span class="fc" id="L25">        GraphTypeBuilder.&lt;Node, DefaultEdge&gt;directed()</span>
+<span class="fc" id="L26">            .allowingSelfLoops(true)</span>
+<span class="fc" id="L27">            .allowingMultipleEdges(true)</span>
+<span class="fc" id="L28">            .weighted(false)</span>
+<span class="fc" id="L29">            .edgeClass(DefaultEdge.class)</span>
+<span class="fc" id="L30">            .buildGraph();</span>
+<span class="fc" id="L31">  }</span>
+
+  /**
+   * Adds a node to the graph.
+   *
+   * @param pNode The node to add
+   */
+  public void addNode(final Node pNode) {
+<span class="fc" id="L39">    graph.addVertex(pNode);</span>
+<span class="fc" id="L40">  }</span>
+
+  /**
+   * Adds a directed edge between two {@link Node}s to the graph.
+   *
+   * @param pStartNode The start node of the edge
+   * @param pEndNode The end node of the edge
+   */
+  public void addEdge(final Node pStartNode, final Node pEndNode) {
+<span class="fc" id="L49">    graph.addEdge(pStartNode, pEndNode);</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Returns the immediate predecessors of a node.
+   *
+   * @param pNode The node who's predecessors we're searching for
+   * @return A set of node's that are predecessors to {@code a}
+   */
+  public Set&lt;Node&gt; getPredecessors(final Node pNode) {
+<span class="fc" id="L59">    Set&lt;Node&gt; predecessors = Sets.newHashSet();</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    for (DefaultEdge edge : graph.incomingEdgesOf(pNode)) {</span>
+<span class="fc" id="L61">      predecessors.add(graph.getEdgeSource(edge));</span>
+<span class="fc" id="L62">    }</span>
+<span class="fc" id="L63">    return predecessors;</span>
+  }
+
+  /**
+   * Returns the immediate successors of a node.
+   *
+   * @param pNode The node who's successors we're searching for
+   * @return A set of node's that are successors to {@code a}
+   */
+  public Set&lt;Node&gt; getSuccessors(final Node pNode) {
+<span class="fc" id="L73">    final Set&lt;Node&gt; successors = Sets.newHashSet();</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">    if (!graph.containsVertex(pNode)) {</span>
+<span class="nc" id="L75">      return successors;</span>
+    }
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    for (DefaultEdge edge : graph.outgoingEdgesOf(pNode)) {</span>
+<span class="fc" id="L78">      successors.add(graph.getEdgeTarget(edge));</span>
+<span class="fc" id="L79">    }</span>
+<span class="fc" id="L80">    return successors;</span>
+  }
+
+  /**
+   * Returns all of the nodes in the graph.
+   *
+   * @return A set of all {@link Node}s in the graph
+   */
+  public Set&lt;Node&gt; getNodes() {
+<span class="fc" id="L89">    return graph.vertexSet();</span>
+  }
+
+  /**
+   * Returns the entry node - the node with no predecessors. Assumes that there is only one such
+   * node in the graph.
+   *
+   * @return The entry {@link Node} of the graph
+   */
+  public Node getEntry() {
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    for (Node node : getNodes()) {</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      if (graph.incomingEdgesOf(node).isEmpty()) {</span>
+<span class="fc" id="L101">        return node;</span>
+      }
+<span class="fc" id="L103">    }</span>
+<span class="fc" id="L104">    return null;</span>
+  }
+
+  /**
+   * Returns the exit node - the node with no successors. Assumes that there is only one such node
+   * in the graph.
+   *
+   * @return The exit {@link Node} of the graph
+   */
+  public Node getExit() {
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    for (Node node : getNodes()) {</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">      if (graph.outgoingEdgesOf(node).isEmpty()) {</span>
+<span class="fc" id="L116">        return node;</span>
+      }
+<span class="fc" id="L118">    }</span>
+<span class="nc" id="L119">    return null;</span>
+  }
+
+  /**
+   * Returns a representation of the graph in the GraphViz dot format. This can be written to a file
+   * and visualised using GraphViz.
+   *
+   * @return A string representation of the graph in GraphViz dot format.
+   */
+  public String toString() {
+<span class="nc" id="L129">    final StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L130">    builder.append(&quot;digraph cfg{\n&quot;);</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">    for (Node node : getNodes()) {</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">      for (Node successor : getSuccessors(node)) {</span>
+<span class="nc" id="L133">        builder.append(node.toString()).append(&quot;-&gt;&quot;).append(successor.toString()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L134">      }</span>
+<span class="nc" id="L135">    }</span>
+<span class="nc" id="L136">    builder.append(&quot;}&quot;);</span>
+<span class="nc" id="L137">    return builder.toString();</span>
+  }
+
+  /**
+   * Return all transitive successors of m - i.e. any instructions that could eventually be reached
+   * from m.
+   *
+   * @param pNode The {@link Node} who's transitive successors we're searching for
+   * @return A collection of {@link Node}s that are transitive successors to {@code m}
+   */
+  public Collection&lt;Node&gt; getTransitiveSuccessors(final Node pNode) {
+<span class="fc" id="L148">    return transitiveSuccessors(pNode, Sets.newHashSet());</span>
+  }
+
+  private Collection&lt;Node&gt; transitiveSuccessors(final Node pNode, final Set&lt;Node&gt; pDoneSet) {
+<span class="fc" id="L152">    final Collection&lt;Node&gt; successors = Sets.newHashSet();</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    for (Node node : getSuccessors(pNode)) {</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">      if (!pDoneSet.contains(node)) {</span>
+<span class="fc" id="L155">        successors.add(node);</span>
+<span class="fc" id="L156">        pDoneSet.add(node);</span>
+<span class="fc" id="L157">        successors.addAll(transitiveSuccessors(node, pDoneSet));</span>
+      }
+<span class="fc" id="L159">    }</span>
+<span class="fc" id="L160">    return successors;</span>
+  }
+
+  /**
+   * Searches the CFG for successors of a {@link Node} until the next node containing a {@link
+   * LineNumberNode} is found. These successors are returned.
+   *
+   * @param pNode The {@link Node} of the graph to start with
+   * @return A collection of nodes that follow the {@code pNode} until a {@link LineNumberNode}
+   *     follows.
+   */
+  public Collection&lt;Node&gt; getSuccessorsUntilNextLineNumber(final Node pNode) {
+<span class="fc" id="L172">    final Collection&lt;Node&gt; successors = Sets.newHashSet();</span>
+<span class="fc" id="L173">    final Queue&lt;Node&gt; waitList = Lists.newLinkedList();</span>
+<span class="fc" id="L174">    waitList.offer(pNode);</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    while (!waitList.isEmpty()) {</span>
+<span class="fc" id="L176">      final Node current = waitList.poll();</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">      for (final Node successor : getSuccessors(current)) {</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (successor.getInstruction() instanceof LineNumberNode) {</span>
+<span class="fc" id="L179">          continue;</span>
+        }
+<span class="fc" id="L181">        successors.add(successor);</span>
+<span class="fc" id="L182">        waitList.offer(successor);</span>
+<span class="fc" id="L183">      }</span>
+<span class="fc" id="L184">    }</span>
+<span class="fc" id="L185">    return successors;</span>
+  }
+
+  /**
+   * For a given pair of nodes in a DAG, return the ancestor that is common to both nodes.
+   *
+   * &lt;p&gt;Important: This operation presumes that the graph contains no cycles.
+   *
+   * @param pFirstNode A {@link Node}
+   * @param pSecondNode Another {@link Node}
+   * @return The node that is the least common ancestor of the two parameter nodes
+   */
+  public Node getLeastCommonAncestor(final Node pFirstNode, final Node pSecondNode) {
+<span class="fc" id="L198">    @Var Node current = pFirstNode;</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">    while (!containsTransitiveSuccessors(current, pFirstNode, pSecondNode)) {</span>
+<span class="fc" id="L200">      current = getPredecessors(current).iterator().next();</span>
+    }
+<span class="fc" id="L202">    return current;</span>
+  }
+
+  private boolean containsTransitiveSuccessors(
+      final Node pStartNode, final Node pFirstNode, final Node pSecondNode) {
+<span class="fc" id="L207">    Collection&lt;Node&gt; transitiveSuccessors = getTransitiveSuccessors(pStartNode);</span>
+<span class="fc" id="L208">    transitiveSuccessors.add(pStartNode);</span>
+<span class="pc bpc" id="L209" title="1 of 4 branches missed.">    return transitiveSuccessors.contains(pFirstNode) &amp;&amp; transitiveSuccessors.contains(pSecondNode);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
