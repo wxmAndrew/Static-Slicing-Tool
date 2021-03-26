@@ -1,10 +1,9 @@
 # Static-Slicing-Tool
 
 ## Course: Software Analysis, Summer Semester 2020 
-## Univeristy of Passau, CS master program
-(class assignment)
+Univeristy of Passau, CS master program
 
-The task is to implement the static slicing algorithm, for Java byte code. Program slicing computes a set of program statements, called program slice, that may affect the values at some point of interest, the slicing criterion. In particular to implement an intra-procedural static slicer for Java byte
+It is a class assignment. The task is to implement the static slicing algorithm, for Java byte code. Program slicing computes a set of program statements, called program slice, that may affect the values at some point of interest, the slicing criterion. In particular to implement an intra-procedural static slicer for Java byte
 code. 
 
 The tool takes as input a program 𝑃—an arbitrary Java class file in an arbitrary package available in the class path—and a slicing criterion 𝑆. The slicing criterion 𝑆 of a program 𝑃 is a tuple ⟨𝑠, 𝑉⟩, where 𝑠 is a program statement and 𝑉 is a variable set of 𝑃.
